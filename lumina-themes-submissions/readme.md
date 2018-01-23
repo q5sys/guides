@@ -1,4 +1,4 @@
-###Lumina Themes Wallpaper submission guide:
+### Lumina Themes Wallpaper submission guide:
 ﻿
 Requirements:
 
@@ -6,7 +6,7 @@ Requirements:
 + Photos with resolution of 3840x2160
 + Allow TrueOS to redistribute your image.
 
-####Steps:
+#### Steps:
 
 + Open the Lumina Themes repository: https://github.com/trueos/lumina-themes
 + Create a fork of the repository. 
@@ -20,13 +20,16 @@ Requirements:
 reorganized in the future.
 
 + Click "Upload Files": 
+
 ![Upload](https://github.com/trueos/guides/blob/master/lumina-themes-submissions/content/upload_files.png)
 
 + Upload your image file:
+
 ![Upload Image](https://github.com/trueos/guides/blob/master/lumina-themes-submissions/content/upload_files_2.png)
 ![Upload Image](https://github.com/trueos/guides/blob/master/lumina-themes-submissions/content/upload_files_3.png)
 
 + Copy the commit hash: 
+
 ![Copu Commit Hash](https://github.com/trueos/guides/blob/master/lumina-themes-submissions/content/get_commit_hash.png)
 
 + Create a License file.
@@ -41,13 +44,16 @@ Full License : https://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 
 + Upload the license file using the same process as an image: 
+
 ![Uplaod License](https://github.com/trueos/guides/blob/master/lumina-themes-submissions/content/upload_files_4.png)
 
 + In the forked repository on GitHub, create a pull request:
+
 ![Pull Request](https://github.com/trueos/guides/blob/master/lumina-themes-submissions/content/pull_request.png)
 ![Pull Request](https://github.com/trueos/guides/blob/master/lumina-themes-submissions/content/pull_request_2.png)
 ![Pull Request](https://github.com/trueos/guides/blob/master/lumina-themes-submissions/content/pull_request_3.png)
 
-+ Repeat these steps for every wallpaper you want to add. That's it! We'll take care of the rest. If there is a problem or more information is needed, we need 
++ Repeat these steps for every wallpaper you want to add. That's it! 
++ We'll take care of the rest. If there is a problem or more information is needed, we need 
 anything else, we will make a comment on your Pull Request. Keep an eye on your email!
 
