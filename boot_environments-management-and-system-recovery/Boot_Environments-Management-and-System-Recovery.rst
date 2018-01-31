@@ -44,7 +44,6 @@ Open the |sysadm| Control Panel and double-click Boot Environments as
 shown in :numref:`Figure %s <SysAdmControlPanel>`.
 
 .. _SysAdmControlPanel:
-
 .. figure:: images/SysAdmControlPanel.png
    :scale: 100%
 
@@ -109,7 +108,7 @@ system, the cloned BE would increase by 5GB. This is yet another great
 feature of boot environments.
 
 .. _ClonedBE:
-.. figure:: images/ClonedBE.png
+.. figure:: images/ActivateBE.png
    :scale: 100%
 
    Cloned Boot Environment
@@ -194,9 +193,9 @@ select the desired BE to be made active, and click the
 
    Activate Boot Environment
 
-.. note:: For more information about the creation and management of BEs,
-	  please refer to the |sysadm| Client Handbook about the
-	  :sysclbk:`Boot Environment Manager <boot-environment-manager>`.
+  .. note:: For more information about the creation and management of
+	    BEs, please refer to the |sysadm| Client Handbook about the
+	    :sysclbk:`Boot Environment Manager <boot-environment-manager>`.
 
 How to Recover an Unbootable System using Boot Environments
 ***********************************************************
@@ -256,13 +255,13 @@ boot the newly selected BE. The system will now boot using the new
 boot environment instead of the previous boot environment that would
 not boot.
 
-.. note:: Be sure to read the boot choices carefully and choose the
-        correct option for "Select Boot Environment...". The number
-        itself is irrelevant, what is important is the option itself.
-        Be sure to choose the correct option
+  .. note:: Be sure to read the boot choices carefully and choose the
+	    correct option for "Select Boot Environment...". The number
+	    itself is irrelevant, what is important is the option
+	    itself. Be sure to choose the correct option
 
-Some systems may have more or different options on the first boot menu
-than what is shown in the example screenshot. For example, in
+Some systems may have more or even different options on the first boot
+menu than what is shown in the example screenshot. For example, in
 :numref:`Figure %s <Alternate Boot Menu>` the option to enter the boot
 environment selection menu is actually
 :guilabel:`7. Select Boot Environment...` As stated in the note, the
@@ -273,8 +272,8 @@ Booting into the Working Boot Environment.
 ------------------------------------------
 
 After successfully booting the system into a working boot environment,
-the |sysadm| Boot Environment Manager will confirm the system was booted
-into the BE that was selected during boot as indicated by the
+the |sysadm| Boot Environment Manager will confirm the system was
+booted into the BE that was selected during boot as indicated by the
 :guilabel:`N` (indicating active Now) under the Active column.
 
 Now that the system is booted into a working boot environment, the
