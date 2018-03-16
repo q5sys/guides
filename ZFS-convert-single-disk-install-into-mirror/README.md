@@ -1,4 +1,4 @@
-### Turn a 1-Disk ZFS Root-Pool Into a 2-Disk Mirrored Root-Pool
+### Convert a 1-Disk ZFS Root-Pool Into a 2-Disk Mirrored Root-Pool
 
 #### Preface:
 
