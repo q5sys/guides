@@ -29,53 +29,53 @@ In the above example TrueOS was installed with no partition changes, GELI encryp
 + Now the disk layout must be written out with _gpart_. **Note:** adding a smaller disk than the original one is not covered by this guide. The _gpart_ utility on FreeBSD is also quite different from other operating systems such as GNU/Linux. It is also assumed *ada0* is the first disk and *ada1* is the second disk:
 
 ```
-sudo gpart backup _ada0_ | sudo gpart restore _ada1_
+sudo gpart backup ada0 | sudo gpart restore ada1
 gpart status
 ```
 
 + Next, the MBR, GPT, and GELI bootcode information must be written out to the new mirror disk drive. **Note**: the bootloader is not installed with _installboot_. To ensure this process works, the first partition (BOOT) on the disk TrueOS is installed on can also be copied with diskdump (*dd*). It is recommended to flush all OS buffers/caches afterwards.
 
 ```
-sudo gpart bootcode -b /boot/pmbr -p /boot/gptzfsboot -i 1 _ada1_
-sudo dd if=_/dev/ada0p1_ of=_/dev/ada1p1_
+sudo gpart bootcode -b /boot/pmbr -p /boot/gptzfsboot -i 1 ada1
+sudo dd if=/dev/ada0p1 of=/dev/ada1p1
 sudo sync
 ```
 
 + In TrueOS, the installer uses a _/dev/label/swap0.eli_ device to reference the SWAP partition. In the next example SWAP is turned off and replaced. AES in XTS mode is used for crypto partitions two (ZFS) and three (SWAP). **Note**: TrueOS does not use a password file by default. A GELI boot implementation with these files is not yet recommended in the FreeBSD handbook.
 
 ```
-sudo swapoff _/dev/label/swap0.eli_
-sudo geli init -b -s 512 _ada1p2_
-sudo geli attach _ada1p2_
-sudo geli init -b -s 512 _ada0p3_
-sudo geli attach _ada0p3_
-sudo geli init -b -s 512 _ada1p3_
-sudo geli attach _ada1p3_
+sudo swapoff /dev/label/swap0.eli
+sudo geli init -b -s 512 ada1p2
+sudo geli attach ada1p2
+sudo geli init -b -s 512 ada0p3
+sudo geli attach ada0p3
+sudo geli init -b -s 512 ada1p3
+sudo geli attach ada1p3
 geom DISK status -ga
 geli list
-// The corresponding change in _/etc/fstab_ has to be made!
-sudo swapon _/dev/ada0p3.eli_
+// The corresponding change in /etc/fstab has to be made!
+sudo swapon /dev/ada0p3.eli
 swapinfo
 ```
 
 + Next, add partition two (ZFS) on the second disk to the ZFS root pool. **Note**: The first partition (BOOT) containing all the boot information and partitions from the disk drive and the third partition (SWAP) will not be mirrored.
 
 ```
-sudo zpool attach _root-pool-name_ mirror _ada0p2.eli_ _ada1p2.eli_
+sudo zpool attach root-pool-name mirror ada0p2.eli ada1p2.eli
 zpool status -v
 ```
 
 + Set the boot flag for the second partition (ZFS) on the new mirror disk. _GELIBOOT_ must explicitly be set as bootable with GELI encryption. It is also recommended to add the GEOM mirror module and set *canmount* for the second partition's (ZFS) file system. **Note**: Dataset name (_12.0-CURRENT-up-20180213_152723_) may vary. The consecutive scrub operation is strongly recommended but can take a few minutes or longer depending on the amount of data. The verbose boot option must be enabled in the bootloader configuration **loader.conf(5)** to unlock SWAP during boot.
 
 ```
-sudo geli configure -g _/dev/ada1p2.eli_
+sudo geli configure -g /dev/ada1p2.eli
 geli list
 sudo echo 'geom_mirror_load="YES"' > /boot/loader.conf
 sudo echo 'verbose_loading="YES"' > /boot/loader.conf
 zfs list -t all
-sudo zfs set canmount=on _root-pool-name/ROOT/initial_
-sudo zfs set canmount=on _root-pool-name/ROOT/12.0-CURRENT-up-20180213_152723_
-sudo zpool scrub _zfspool-name_
+sudo zfs set canmount=on root-pool-name/ROOT/initial
+sudo zfs set canmount=on root-pool-name/ROOT/12.0-CURRENT-up-20180213_152723
+sudo zpool scrub zfspool-name
 zpool status
 ```
 
