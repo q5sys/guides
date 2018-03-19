@@ -20,7 +20,7 @@ This community guide describes how to create a **root mirror disk** of a **TrueO
 geom DISK status -ga
 gpart show -r 
 zpool status
-zpool status _root-pool-name_
+zpool status root-pool-name
 mount | sort
 ```
 
