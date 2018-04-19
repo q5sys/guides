@@ -1,6 +1,6 @@
 ### Lumina Themes Wallpaper submission guide:
 ﻿
-Requirements:
+#### Requirements:
 
 + Github account
 + Photos with resolution of 3840x2160
