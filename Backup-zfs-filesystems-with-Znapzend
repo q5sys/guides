@@ -42,7 +42,7 @@ B)Enable ssh connection from s1 to s2:
 
   edit sshd_config.  I use editor ee for these kinds of edits:
 
-  root@s2 # cd /etc/ssh/sshd_config
+  root@s2 # cd /etc/ssh
   root@s2 # ee sshd_config
 
   Insert the following lines: 
@@ -62,7 +62,7 @@ Send ssh key to s2.
   /root/.ssh/authorized_keys on s2.  Details are widely published and not in this guide. 
   Test with:
   
-  root@s1  # ssh -v root@yyy.yyy.yyy.yyy (ip address or domain name of s2 if present in local dns) <- 
+  root@s1  # ssh -v root@yyy.yyy.yyy.yyy  <- (ip address or domain name of s2 if present in local dns)  
 
 This should start a terminal session as root on s2 without requiring a password. The -v flag
 will demonstrate key-based login.  Use -vv or -vvv for more information for more troubleshooting
@@ -146,7 +146,7 @@ Its elements are stripped down for our case which results in the following comma
 root@s1 #  znapzendzetup create --recursive\
    --mbuffer=/usr/local/bin/mbuffer \
    SRC '1week=>1day,1month=>1week,10y=>1month' s1data/archive \
-   DST:0 '1week=>1day,1month=>1week,10years=>1month' root@10.1.1.202:s2data/archive \
+   DST:0 '1week=>1day,1month=>1week,10years=>1month' root@yyy.yyy.yyy.yyy:s2data/archive \
    DST:1 '1week=>1day,1month=>1week,10years=>1month' usbpool/archive
 
 Translation: 
@@ -181,7 +181,7 @@ It turns out that the name of the zfs source is also the name of the configurati
    
 root@s1 #  znapzendzetup list s1data/archive
 *** backup plan: s1data/archive ***
-dst_0           = root@10.1.1.202:s1data/archive
+dst_0           = root@yyy.yyy.yyy.yyy:s2data/archive
 dst_0_plan      = 1week=>1day,1month=>1week,10years=>1month
 dst_1           = usbpool/archive
 dst_1_plan      = 1week=>1day,1month=>1week,10years=>1month
@@ -196,7 +196,7 @@ src_plan        = 1week=>1day,1month=>1week,10years=>1month
 tsformat        = %Y-%m-%d-%H%M%S
 zend_delay      = 0
 
-NOTE: if you have modified your configuration, send a HUP signal
+NOTE: if you have modified an EXISTING configuration, send a HUP signal
 (pkill -HUP znapzend) to your znapzend daemon for it to notice the change.  
   
     
@@ -213,14 +213,24 @@ E)  Run the znapzend script itself.
  2.  Start the znapzend daemon, which is the final step:
   
   root@s1  # znapzend --debug --daemonize s1data/archive
+ 
+Subsequent send operations will only send data increments, and will likely be much smaller/faster.  The --debug
+flag is not necessary but will update your log file.  It does not create a large number of entries.
 
-Subsequent send operations will only send data increments, and will likely be much smaller/faster.  
-
-F) The znapzend daemon will not start itself automatically at reboot.  The znapzend github 
+F) Start znapzend after a reboot:
+The znapzend daemon will not start itself automatically at reboot.  The znapzend github 
 website has init.d options but I could not make them work with FreeBSD.
 
 Instead, I created a cronjob on s1 taking advantage of the @reboot option - 
 As root, add the following:  @reboot /usr/local/bin/znapzend
+
+root@s1 # crontab -e
+
+This opens a vi session which permits the creation of the cronjob.  It can be verified after finishing 
+the vi session with:
+
+root@s1  # crontab -l
+
 My crontab looks as follows -
 
 #Start znapzend at reboot
