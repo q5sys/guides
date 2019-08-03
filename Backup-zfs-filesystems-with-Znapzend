@@ -1,4 +1,4 @@
-ZNAPZEND - BACKUP YOUR DATA USING ZFS' BUILTIN SNAPSHOT AND SEND/RECEIVE FEATURES
+ZNAPZEND - BACKUP YOUR DATA USING ZFS BUILTIN SNAPSHOT AND SEND/RECEIVE FEATURES
 
 Znapzend automates BOTH creation of zfs snapshots AND sending them to another filesystem.
 Most other zfs utilities do one or the other but not both.
