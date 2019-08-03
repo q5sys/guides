@@ -1,21 +1,39 @@
 ZNAPZEND - BACKUP YOUR DATA USING ZFS BUILTIN SNAPSHOT AND SEND/RECEIVE FEATURES
 
+SUMMARY
+This tutorial begins with the background steps to enable znapzend to create zfs snapshots 
+and then send them to either a local USB drive, another LAN server, or both. A simple yet
+complete example for snapshot creation and send/receive configuration is provided.  For 
+users just getting started with FreeBSD and Project-Trident, the setup detail may be helpful. 
 Znapzend automates BOTH creation of zfs snapshots AND sending them to another filesystem.
 Most other zfs utilities do one or the other but not both.
 
-Scenario - Backup of valuable data residing in a zfs filesytem on server1 ('s1') is needed.
-S1 runs Trident (See Project-Trident on Github), FreeBSD with a GUI overlay.  
-Two backups of s1's data will be created.  The first backup is to an external USB drive 
-attached to s1.  The second backup is sent to another server, server2 ('s2') present on 
-the local area network (LAN). S2 has a zfs filesystem created to receive zfs snapshots from 
-s1 and duplicates s1's data on s2. The zfs filesystem created on s1 is 's1data/archive'. The 
-receiving zfs filesystem on s2 will be created as 's2data/archive'.  
+SCENARIO
+Backup of valuable data residing in a zfs filesytem on server1 ('s1') is needed.
+S1 runs Trident (See Project-Trident on Github), a complete FreeBSD system with an 
+excellent GUI overlay.  Two backups of s1's data will be created.  The first backup is 
+to an external USB drive attached to s1.  The second backup is sent to another server, 
+server2 ('s2') present on the local area network (LAN). S2 has a zfs filesystem created 
+to receive zfs snapshots from s1 and duplicates s1's data on s2. The zfs filesystem 
+created on s1 is 's1data/archive'. The receiving zfs filesystem on s2 will be created as 
+'s2data/archive'.  
 
 The zfs filesystem does not directly copy data during the send/receive operation.  
 Instead, it sends a zfs snapshot of the original data to a receiving zfs filesystem.  
 For most purposes, this distinction is not important - the snapshot contains the original 
 data and can be used to retrieve it.  Recovery of data is not covered in this document but 
-is generally straightforward using zfs command options.
+is generally straightforward using zfs command options.  
+
+In this guide, commands are carried out as root.  Assuming you login as 'user', switch to 'root' from 'user' as
+follows:
+
+[user@s1]  ~% su -
+Password:  (type in root password here; when you press return, your prompt will change to the following:)
+root@s1:~ # 
+
+When you have finished as root, type 'exit' to return to the 'user' prompt.
+Alternatively, you can preceed each root command with 'sudo'.  Depending on how recently you last executed a
+command, you may be asked for the root password.
 
 A)Install software:
  On s1, znapzend can be installed either with App Cafe (Trident) or using the CLI:
@@ -115,11 +133,19 @@ the CLI commands can be used.
  
  
 D)  Set up Znapzend itself:
-Znapzend consists of 3 separate parts: znapzend - the actual script/daemon, znapzendzetup - 
-which configures the daemon, and znapzendztats - which shows how much space the snapshots
-have consumed, and will not be tested here.  Start with znapzendzetup.  Read the
-znapzendzetup manual, then continue with the implementation example.  The manual
-clarifies the configuration's parts and specifically defines the use of time intervals.
+Znapzend resides on Github and can be found at the following web link:
+
+https://github.com/oetiker/znapzend
+
+The App Cafe (or FreeBSD) package includes 3 separate parts which are properly placed within the FreeBSD filesystem when you 
+install the package: znapzend - the actual script/daemon, znapzendzetup - which configures the daemon, and 
+znapzendztats - which shows how much space the snapshots have consumed, and will not be tested here.  Start with znapzendzetup.  
+Read the znapzendzetup man pages (installed when you install the pkg), then continue with the implementation example: 
+
+root@s1 # man znapzendzetup
+
+This command will provide details about the various znapzendzetup subcommands and formatting requirements,
+especially how to schedule znapzend's activities.  The following link contains essentially the same information:
 
 https://github.com/oetiker/znapzend/blob/master/doc/znapzendzetup.pod
 
@@ -130,7 +156,7 @@ gives the snapshot retention interval, and the second the frequency of that the 
 send/receive operation is performed.  The manual outlines the syntax for retention 
 and frequency; a very wide range of options exists.
 
-The manual gives the following complete example for the use of the znapzendzetup command:
+The following is a complete example for the use of the znapzendzetup command taken from the man page:
 Start with it and simply modify it as required/desired:
 
 znapzendzetup create --recursive --mbuffer=/opt/omni/bin/mbuffer \
@@ -159,12 +185,13 @@ create - create a list of plan options for the daemon to use
         pkg install znapzend as a dependency.  Here is specified the full path to mbuffer's location in 
         FreeBSD's filesystem.
 SRC - starts with the temporal plan for the CREATION of snapshots (notice the single-quotation 
-       marks), and lists the zfs filesystem to be duplicated.
+       marks), and lists the zfs filesystem to be duplicated. In our example, snapshots will be created 
+       daily for one week, weekly for a month, monthly for 10 years.
 DST:0 - the :0 denotes that this is the first of a list of destinations.  The time elements
        which follow give the frequency of the send/receive operation.  In this example, the
        snapshot creation schedule and the send/receive schedule are the same.  DST:0 is for 
-       send/receive on the LAN and ssh is used. 
-DST:1 - the :1 denotes another destination.  Same schedule for local zfs send/receive.  
+       send/receive to s2 on the LAN and ssh is used. 
+DST:1 - the :1 denotes another destination,to the local USB drive in our example.  Same schedule for zfs send/receive to s2.  
 
 Some elements in the manual's example have not been used because the defaults do not 
 require changes.  These include the mbuffer size, and the time labeling format for snapshots.
@@ -177,7 +204,7 @@ specify a different snapshot labelling format, change the --tsformat option.
 
 root@s1 #   znapzendzetup list s1data/archive
 
-It turns out that the name of the zfs source is also the name of the configuration.  
+It turns out that the name of the zfs source is also the name of the configuration: 
    
 root@s1 #  znapzendzetup list s1data/archive
 *** backup plan: s1data/archive ***
@@ -201,12 +228,19 @@ NOTE: if you have modified an EXISTING configuration, send a HUP signal
   
     
 E)  Run the znapzend script itself.  
+Information about this step can be obtained with the following command:
+
+root@s1 # man znapzend
+
+The website for this information is:
+
+https://github.com/oetiker/znapzend/tree/master/doc
 
  1. The first time run it with the runonce options:  
   
   root@s1  # znapzend --debug --runonce=s1data/archive
 
-  This will create a snapshot and if all is right, it will send the snapshot to the usb drive and
+  This will create a snapshot and if all is right, it will send the snapshot to both the usb drive and
   s2.  This confirms that the system is working properly. Since the entire archive is being 
   sent, it will take time if the archive contains a large amount of data.  
 
@@ -220,7 +254,6 @@ flag is not necessary but will update your log file.  It does not create a large
 F) Start znapzend after a reboot:
 The znapzend daemon will not start itself automatically at reboot.  The znapzend github 
 website has init.d options but I could not make them work with FreeBSD.
-
 Instead, I created a cronjob on s1 taking advantage of the @reboot option - 
 As root, add the following:  @reboot /usr/local/bin/znapzend
 
@@ -239,8 +272,3 @@ My crontab looks as follows -
 This makes the system wait 10 minutes (600 seconds) after boot up to start the daemon - 
 plenty of time for other processes to stablize.
 
-SUMMARY
-This tutorial begins with the background steps to enable znapzend to create zfs snapshots 
-and then send them to either a local USB drive, another LAN server, or both. A simple yet
-complete example for snapshot creation and send/receive configuration is provided.  For 
-users just getting started with FreeBSD and Project-Trident, the extra detail may be helpful.
